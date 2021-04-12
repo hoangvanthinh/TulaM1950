@@ -46,6 +46,26 @@ namespace M1950
             En_Checksum.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.En_Checksum);
             Erase.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.En_Ers);
             En_Buzz.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.En_Buzz);
+
+            sc1.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S1);
+            sc2.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S2);
+            sc3.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S3);
+            sc4.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S4);
+            sc5.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S5);
+            sc6.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S6);
+            sc7.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S7);
+            sc8.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S8);
+            sc9.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S9);
+            sc10.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S10);
+            sc11.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S11);
+            sc12.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S12);
+            sc13.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S13);
+            sc14.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S14);
+            sc15.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S15);
+            sc16.Checked = Convert.ToBoolean(M1950.Properties.Settings.Default.S16);
+
+
+
         }
         void Serial_port_setup()
         {
@@ -61,11 +81,11 @@ namespace M1950
                     T_COM.Items.Add(p);
                    
                 }
-                R_COM.SelectedItem = "COM40";
-                R_Baud.SelectedItem = "9600";
+                R_COM.SelectedItem = "COM7";
+                R_Baud.SelectedItem = "115200";
                 R_DataBit.SelectedItem = "8";
                 R_ParityBit.SelectedItem = "None";
-                R_StopBit.SelectedItem = "1";
+                R_StopBit.SelectedItem = "2";
 
                 T_COM.SelectedItem = "COM41";
                 T_Baud.SelectedItem = "9600";
@@ -196,7 +216,7 @@ namespace M1950
         private void Cksum_Click(object sender, EventArgs e)
         {
             M1950_RS232.Req_checksum_MCU = 1;
-
+            Command.Text = null;
             try
             {
                 M1950_command.Checksum8D();
@@ -211,7 +231,7 @@ namespace M1950
         private void Dw_Click(object sender, EventArgs e)
         {
             M1950_RS232.Req_Pragram = 1;
-
+            Command.Text = null;
             try
             {
                 M1950_command.Program();
@@ -220,6 +240,24 @@ namespace M1950
             {
                 MessageBox.Show("M1950 Lost connect!");
             }
+            if (sc1.Checked == true) SOCKET1.BackColor = Color.White;
+            if (sc2.Checked == true) SOCKET2.BackColor = Color.White;
+            if (sc3.Checked == true) SOCKET3.BackColor = Color.White;
+            if (sc4.Checked == true) SOCKET4.BackColor = Color.White;
+            if (sc5.Checked == true) SOCKET5.BackColor = Color.White;
+            if (sc6.Checked == true) SOCKET6.BackColor = Color.White;
+            if (sc7.Checked == true) SOCKET7.BackColor = Color.White;
+            if (sc8.Checked == true) SOCKET8.BackColor = Color.White;
+            if (sc9.Checked == true) SOCKET9.BackColor = Color.White;
+            if (sc10.Checked == true) SOCKET10.BackColor = Color.White;
+            if (sc11.Checked == true) SOCKET11.BackColor = Color.White;
+            if (sc12.Checked == true) SOCKET12.BackColor = Color.White;
+            if (sc13.Checked == true) SOCKET13.BackColor = Color.White;
+
+            if (sc14.Checked == true) SOCKET14.BackColor = Color.White;
+            if (sc15.Checked == true) SOCKET15.BackColor = Color.White;
+            if (sc16.Checked == true) SOCKET16.BackColor = Color.White;
+
         }
 
 
@@ -244,11 +282,12 @@ namespace M1950
             if(M1950_RS232.Req_Pragram > 0 && Serial_Connect.Text == "Connected")
             {
                 M1950_RS232.Req_Pragram++;
-                if (M1950_RS232.Req_Pragram > 20)
+                if (M1950_RS232.Req_Pragram > 50)
                 {
                     M1950_RS232.Req_Pragram = 0;
                     try
                     {
+                        //MessageBox.Show("CHECK READ");
                         Read_result_Program();
                     }
                     catch
@@ -258,83 +297,160 @@ namespace M1950
                     
                 }
             }
+            if(M1950_RS232.Req_checksum_MCU > 0 && Serial_Connect.Text == "Connected")
+            {
+                M1950_RS232.Req_checksum_MCU++;
+                if (M1950_RS232.Req_checksum_MCU > 20)
+                {
+                    M1950_RS232.Req_checksum_MCU = 0;
+                    try
+                    {
+                        //MessageBox.Show("CHECK READ");
+                        Read_result_ChecksumMCU();
+                    }
+                    catch
+                    {
+
+                    }
+
+                }
+            }
+        }
+
+        private void Read_result_ChecksumMCU()
+        {
+            string temp;
+            int pStart;
+            temp = Command.Text;
+            
+            //pStart = temp.LastIndexOf("PASS");
+            temp = temp.Substring(0, 8);
+            Checksum_Ans.Text = temp;
         }
         private void Read_result_Program()
         {
             string temp;
             int pStart;
             temp = Command.Text;
+            //pStart = temp.LastIndexOf("W");
+            //temp = temp.Substring(pStart+3, 16);
             pStart = temp.LastIndexOf(";");
-            temp = temp.Substring(pStart - 19, 16);
+            temp = temp.Substring(pStart-19, 16);
             textBox1.Text = temp;
-
+            //MessageBox.Show("OK");
             // SOCKET 1
-            if (temp[0] == 'o') SOCKET1.BackColor = Color.LimeGreen;
-            else if (temp[0] == 'x') SOCKET1.BackColor = Color.Red;
-            else if (temp[0] == '-') SOCKET1.BackColor = Color.Gray;
-                
+            if (sc1.Checked == true)
+            {
+                if (temp[0] == 'o') SOCKET1.BackColor = Color.LimeGreen;
+                else if (temp[0] == 'x') SOCKET1.BackColor = Color.Red;
+                else if (temp[0] == '-') SOCKET1.BackColor = Color.Gray;
+            }
             // SOCKET 2
-            if (temp[1] == 'o') SOCKET2.BackColor = Color.LimeGreen;
-            else if (temp[1] == 'x') SOCKET2.BackColor = Color.Red;
-            else if (temp[1] == '-') SOCKET2.BackColor = Color.Gray;
+            if (sc2.Checked == true)
+            {
+                if (temp[1] == 'o') SOCKET2.BackColor = Color.LimeGreen;
+                else if (temp[1] == 'x') SOCKET2.BackColor = Color.Red;
+                else if (temp[1] == '-') SOCKET2.BackColor = Color.Gray;
+            }
             // SOCKET 3
-            if (temp[2] == 'o') SOCKET3.BackColor = Color.LimeGreen;
-            else if (temp[2] == 'x') SOCKET3.BackColor = Color.Red;
-            else if (temp[2] == '-') SOCKET3.BackColor = Color.Gray;
+            if (sc3.Checked == true)
+            {
+                if (temp[2] == 'o') SOCKET3.BackColor = Color.LimeGreen;
+                else if (temp[2] == 'x') SOCKET3.BackColor = Color.Red;
+                else if (temp[2] == '-') SOCKET3.BackColor = Color.Gray;
+            }
             // SOCKET 4
-            if (temp[3] == 'o') SOCKET4.BackColor = Color.LimeGreen;
-            else if (temp[3] == 'x') SOCKET4.BackColor = Color.Red;
-            else if (temp[3] == '-') SOCKET4.BackColor = Color.Gray;
+            if (sc4.Checked == true)
+            {
+                if (temp[3] == 'o') SOCKET4.BackColor = Color.LimeGreen;
+                else if (temp[3] == 'x') SOCKET4.BackColor = Color.Red;
+                else if (temp[3] == '-') SOCKET4.BackColor = Color.Gray;
+            }
             // SOCKET 5
-            if (temp[4] == 'o') SOCKET5.BackColor = Color.LimeGreen;
-            else if (temp[4] == 'x') SOCKET5.BackColor = Color.Red;
-            else if (temp[4] == '-') SOCKET5.BackColor = Color.Gray;
+            if (sc5.Checked == true)
+            {
+                if (temp[4] == 'o') SOCKET5.BackColor = Color.LimeGreen;
+                else if (temp[4] == 'x') SOCKET5.BackColor = Color.Red;
+                else if (temp[4] == '-') SOCKET5.BackColor = Color.Gray;
+            }
             // SOCKET 6
-            if (temp[5] == 'o') SOCKET6.BackColor = Color.LimeGreen;
-            else if (temp[5] == 'x') SOCKET6.BackColor = Color.Red;
-            else if (temp[5] == '-') SOCKET6.BackColor = Color.Gray;
+            if (sc6.Checked == true)
+            {
+                if (temp[5] == 'o') SOCKET6.BackColor = Color.LimeGreen;
+                else if (temp[5] == 'x') SOCKET6.BackColor = Color.Red;
+                else if (temp[5] == '-') SOCKET6.BackColor = Color.Gray;
+            }
             // SOCKET 7
-            if (temp[6] == 'o') SOCKET7.BackColor = Color.LimeGreen;
-            else if (temp[6] == 'x') SOCKET7.BackColor = Color.Red;
-            else if (temp[6] == '-') SOCKET7.BackColor = Color.Gray;
+            if (sc7.Checked == true)
+            {
+                if (temp[6] == 'o') SOCKET7.BackColor = Color.LimeGreen;
+                else if (temp[6] == 'x') SOCKET7.BackColor = Color.Red;
+                else if (temp[6] == '-') SOCKET7.BackColor = Color.Gray;
+            }
             // SOCKET 8
-            if (temp[7] == 'o') SOCKET8.BackColor = Color.LimeGreen;
-            else if (temp[7] == 'x') SOCKET8.BackColor = Color.Red;
-            else if (temp[7] == '-') SOCKET8.BackColor = Color.Gray;
-
+            if (sc8.Checked == true)
+            {
+                if (temp[7] == 'o') SOCKET8.BackColor = Color.LimeGreen;
+                else if (temp[7] == 'x') SOCKET8.BackColor = Color.Red;
+                else if (temp[7] == '-') SOCKET8.BackColor = Color.Gray;
+            }
             // SOCKET 9
-            if (temp[8] == 'o') SOCKET9.BackColor = Color.LimeGreen;
-            else if (temp[8] == 'x') SOCKET9.BackColor = Color.Red;
-            else if (temp[8] == '-') SOCKET9.BackColor = Color.Gray;
+            if (sc9.Checked == true)
+            {
+                if (temp[8] == 'o') SOCKET9.BackColor = Color.LimeGreen;
+                else if (temp[8] == 'x') SOCKET9.BackColor = Color.Red;
+                else if (temp[8] == '-') SOCKET9.BackColor = Color.Gray;
+            }
 
             // SOCKET 10
-            if (temp[9] == 'o') SOCKET10.BackColor = Color.LimeGreen;
-            else if (temp[9] == 'x') SOCKET10.BackColor = Color.Red;
-            else if (temp[9] == '-') SOCKET10.BackColor = Color.Gray;
+            if (sc10.Checked == true)
+            {
+                if (temp[9] == 'o') SOCKET10.BackColor = Color.LimeGreen;
+                else if (temp[9] == 'x') SOCKET10.BackColor = Color.Red;
+                else if (temp[9] == '-') SOCKET10.BackColor = Color.Gray;
+            }
             // SOCKET 11
-            if (temp[10] == 'o') SOCKET11.BackColor = Color.LimeGreen;
-            else if (temp[10] == 'x') SOCKET11.BackColor = Color.Red;
-            else if (temp[10] == '-') SOCKET11.BackColor = Color.Gray;
+            if (sc11.Checked == true)
+            {
+                if (temp[10] == 'o') SOCKET11.BackColor = Color.LimeGreen;
+                else if (temp[10] == 'x') SOCKET11.BackColor = Color.Red;
+                else if (temp[10] == '-') SOCKET11.BackColor = Color.Gray;
+            }
             // SOCKET 12
-            if (temp[12] == 'o') SOCKET12.BackColor = Color.LimeGreen;
-            else if (temp[12] == 'x') SOCKET12.BackColor = Color.Red;
-            else if (temp[12] == '-') SOCKET12.BackColor = Color.Gray;
+            if (sc12.Checked == true)
+            {
+                if (temp[11] == 'o') SOCKET12.BackColor = Color.LimeGreen;
+                else if (temp[11] == 'x') SOCKET12.BackColor = Color.Red;
+                else if (temp[11] == '-') SOCKET12.BackColor = Color.Gray;
+            }
             // SOCKET 13
-            if (temp[12] == 'o') SOCKET13.BackColor = Color.LimeGreen;
-            else if (temp[12] == 'x') SOCKET13.BackColor = Color.Red;
-            else if (temp[12] == '-') SOCKET13.BackColor = Color.Gray;
+            if (sc13.Checked == true)
+            {
+                if (temp[12] == 'o') SOCKET13.BackColor = Color.LimeGreen;
+                else if (temp[12] == 'x') SOCKET13.BackColor = Color.Red;
+                else if (temp[12] == '-') SOCKET13.BackColor = Color.Gray;
+            }
             // SOCKET 14
-            if (temp[13] == 'o') SOCKET14.BackColor = Color.LimeGreen;
-            else if (temp[13] == 'x') SOCKET14.BackColor = Color.Red;
-            else if (temp[13] == '-') SOCKET14.BackColor = Color.Gray;
+            if (sc14.Checked == true)
+            {
+                if (temp[13] == 'o') SOCKET14.BackColor = Color.LimeGreen;
+                else if (temp[13] == 'x') SOCKET14.BackColor = Color.Red;
+                else if (temp[13] == '-') SOCKET14.BackColor = Color.Gray;
+            }
             // SOCKET 15
-            if (temp[14] == 'o') SOCKET15.BackColor = Color.LimeGreen;
-            else if (temp[14] == 'x') SOCKET15.BackColor = Color.Red;
-            else if (temp[14] == '-') SOCKET15.BackColor = Color.Gray;
+            if (sc15.Checked == true)
+            {
+                if (temp[14] == 'o') SOCKET15.BackColor = Color.LimeGreen;
+                else if (temp[14] == 'x') SOCKET15.BackColor = Color.Red;
+                else if (temp[14] == '-') SOCKET15.BackColor = Color.Gray;
+            }
             // SOCKET 16
-            if (temp[15] == 'o') SOCKET16.BackColor = Color.LimeGreen;
-            else if (temp[15] == 'x') SOCKET16.BackColor = Color.Red;
-            else if (temp[15] == '-') SOCKET16.BackColor = Color.Gray;
+            if (sc16.Checked == true)
+            {
+                if (temp[15] == 'o') SOCKET16.BackColor = Color.LimeGreen;
+                else if (temp[15] == 'x') SOCKET16.BackColor = Color.Red;
+                else if (temp[15] == '-') SOCKET16.BackColor = Color.Gray;
+            }
 
             for(int i = 0;i<16;i++)
             {
@@ -342,11 +458,13 @@ namespace M1950
                 {
                     M1950_RS232.num_Pass++;
                     M1950_RS232.Socket_NG[i] = 0;
+                    M1950_RS232.Socket_OK[i] = 1;
                 }
                 else if (temp[i] == 'x')
                 {
                     M1950_RS232.num_ERROR++;
                     M1950_RS232.Socket_NG[i] = 1;
+                    M1950_RS232.Socket_OK[i] = 0;
                 }
             }
             Count_PASS.Text = M1950_RS232.num_Pass.ToString();
@@ -488,13 +606,24 @@ namespace M1950
 
             for(int i = 0;i<16;i++)
             {
+                int j = i + 1;
                 if(M1950_RS232.Socket_NG[i] == 1)
                 {
-                    string Full_path_NG_file = Path.Combine(Full_path_NG,"[SOCKET "+ i +"] W" + time + ".txt");
+                    string Full_path_NG_file = Path.Combine(Full_path_NG,"[SOCKET "+ j +"] W" + time + ".txt");
                     using (FileStream fileStream = File.Create(Full_path_NG_file))
                     using (StreamWriter writer = new StreamWriter(fileStream))
                     {
-                        writer.WriteLine("SOCKET" + i + "___" + DateTime.Now.ToString("MM-dd-yyyy-HH:mm:ss"));
+                        writer.WriteLine("SOCKET" + j+ "___" + DateTime.Now.ToString("MM-dd-yyyy-HH:mm:ss"));
+
+                    }
+                }
+                else if(M1950_RS232.Socket_OK[i] == 1)
+                {
+                    string Full_path_OK_file = Path.Combine(Full_path_OK, "[SOCKET " + j + "] W" + time + ".txt");
+                    using (FileStream fileStream = File.Create(Full_path_OK_file))
+                    using (StreamWriter writer = new StreamWriter(fileStream))
+                    {
+                        writer.WriteLine("SOCKET" + j + "___" + DateTime.Now.ToString("MM-dd-yyyy-HH:mm:ss"));
 
                     }
                 }
@@ -543,6 +672,171 @@ namespace M1950
         {
 
             M1950_command.REMOTE();
+        }
+
+        private void sc1_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S1 = sc1.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc1.Checked == true)
+                SOCKET1.Enabled = true;
+            else
+                SOCKET1.Enabled = false;
+        }
+
+        private void sc2_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S2 = sc2.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc2.Checked == true)
+                SOCKET2.Enabled = true;
+            else
+                SOCKET2.Enabled = false;
+        }
+
+        private void sc3_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S3 = sc3.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc3.Checked == true)
+                SOCKET3.Enabled = true;
+            else
+                SOCKET3.Enabled = false;
+        }
+
+        private void sc4_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S4 = sc4.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc4.Checked == true)
+                SOCKET4.Enabled = true;
+            else
+                SOCKET4.Enabled = false;
+        }
+
+        private void sc5_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S5 = sc5.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc5.Checked == true)
+                SOCKET5.Enabled = true;
+            else
+                SOCKET5.Enabled = false;
+        }
+
+        private void sc6_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S6 = sc6.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc6.Checked == true)
+                SOCKET6.Enabled = true;
+            else
+                SOCKET6.Enabled = false;
+        }
+
+        private void sc7_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S7 = sc7.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc7.Checked == true)
+                SOCKET7.Enabled = true;
+            else
+                SOCKET7.Enabled = false;
+        }
+
+        private void sc8_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S8 = sc8.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc8.Checked == true)
+                SOCKET8.Enabled = true;
+            else
+                SOCKET8.Enabled = false;
+        }
+
+        private void sc9_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S9 = sc9.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc9.Checked == true)
+                SOCKET9.Enabled = true;
+            else
+                SOCKET9.Enabled = false;
+        }
+
+        private void sc10_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S10 = sc10.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc10.Checked == true)
+                SOCKET10.Enabled = true;
+            else
+                SOCKET10.Enabled = false;
+        }
+
+        private void sc11_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S11 = sc11.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc11.Checked == true)
+                SOCKET11.Enabled = true;
+            else
+                SOCKET11.Enabled = false;
+        }
+
+        private void sc12_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S12 = sc12.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc12.Checked == true)
+                SOCKET12.Enabled = true;
+            else
+                SOCKET12.Enabled = false;
+        }
+
+        private void sc13_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S13 = sc13.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc13.Checked == true)
+                SOCKET13.Enabled = true;
+            else
+                SOCKET13.Enabled = false;
+        }
+
+        private void sc14_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S14 = sc14.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc14.Checked == true)
+                SOCKET14.Enabled = true;
+            else
+                SOCKET14.Enabled = false;
+        }
+
+        private void sc15_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S15 = sc15.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc15.Checked == true)
+                SOCKET15.Enabled = true;
+            else
+                SOCKET15.Enabled = false;
+        }
+
+        private void sc16_CheckedChanged(object sender, EventArgs e)
+        {
+            M1950.Properties.Settings.Default.S16 = sc16.Checked.ToString();
+            M1950.Properties.Settings.Default.Save();
+            if (sc16.Checked == true)
+                SOCKET16.Enabled = true;
+            else
+                SOCKET16.Enabled = false;
+        }
+
+        private void SOCKET_Enter(object sender, EventArgs e)
+        {
+
         }
 
  

@@ -7,12 +7,12 @@ using System.IO.Ports;
 using System.Windows.Forms;
 
 
-namespace M1950
+namespace M1940
 {
     class M1950_RS232 : SerialPort
     {
         public static int flag = 10;
-        public static int Req_Pragram = 0, Req_checksum_file = 0, Req_checksum_MCU = 0;
+        public static int Req_Pragram = 0, Req_checksum_file = 0, Req_checksum_MCU = 0, Req_VR = 0, Req_COT = 0, Req_BL = 0, Req_ER = 0;
         public static int num_Pass = 0, num_ERROR = 0, num_Sum = 0;
         public static int[] Socket_NG = new int[16];
         public static int[] Socket_OK= new int[16];
@@ -25,7 +25,7 @@ namespace M1950
 
         private string Command_Program = "W\r\n";
         private string Command_Verify = "VF\r\n";
-
+        private string Command_CONTINUOUS = "CT\r\n";
 
         private string Command_Checksum4D = "BO\r\n";
         private string Command_Checksum8D = "BO8\r\n";
@@ -65,6 +65,34 @@ namespace M1950
             if (this.IsOpen)
             {
                 this.Write(Command_Program);
+            }
+        }
+        public void Verify()
+        {
+            if (this.IsOpen)
+            {
+                this.Write(Command_Verify);
+            }
+        }
+        public void Continous()
+        {
+            if (this.IsOpen)
+            {
+                this.Write(Command_CONTINUOUS);
+            }
+        }
+        public void eR()
+        {
+            if (this.IsOpen)
+            {
+                this.Write(Command_Erase);
+            }
+        }
+        public void Blank()
+        {
+            if (this.IsOpen)
+            {
+                this.Write(Command_Blank);
             }
         }
         public void Checksum8D()
